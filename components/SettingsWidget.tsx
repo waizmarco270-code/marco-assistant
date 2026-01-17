@@ -45,8 +45,8 @@ export const SettingsWidget: React.FC<SettingsWidgetProps> = ({ isActive, onClos
             setSavedKey(true);
         } else {
             setKeyStatus('invalid');
-            // Revert to process.env key if validation fails to keep app usable
-            geminiService.updateApiKey(process.env.API_KEY || ''); 
+            // Revert to saved key or system default if validation fails
+            geminiService.updateApiKey(localStorage.getItem('MARCO_API_KEY') || process.env.API_KEY || process.env.GEMINI_API_KEY || ''); 
         }
     };
 
@@ -55,7 +55,7 @@ export const SettingsWidget: React.FC<SettingsWidgetProps> = ({ isActive, onClos
         setApiKey('');
         setSavedKey(false);
         setKeyStatus('idle');
-        geminiService.updateApiKey(process.env.API_KEY || '');
+        geminiService.updateApiKey(process.env.API_KEY || process.env.GEMINI_API_KEY || '');
     };
 
     if (!isActive) return null;

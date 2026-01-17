@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Camera, Mic, MicOff, Power, Video, VideoOff, Zap, ShieldAlert, MessageSquare, Send, X, Settings as SettingsIcon } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
-import JSZip from 'jszip'; // Imported from esm.sh
+import JSZip from 'jszip';
 import { GeminiLiveService } from './services/geminiService';
 import { WakeWordService } from './services/wakeWordService';
 import { MemoryService, FileHistoryEntry, VaultItem, EventCountdown } from './services/memoryService';
@@ -85,7 +85,11 @@ const App: React.FC = () => {
   });
 
   // --- Refs ---
-  const geminiService = useRef<GeminiLiveService>(new GeminiLiveService({ apiKey: process.env.API_KEY as string }));
+  // Initialize with LocalStorage key (User Preference) or Environment Key (System Default)
+  // Supports 'API_KEY' (standard) and 'GEMINI_API_KEY' (legacy/user fallback)
+  const geminiService = useRef<GeminiLiveService>(new GeminiLiveService({ 
+    apiKey: localStorage.getItem('MARCO_API_KEY') || process.env.API_KEY || process.env.GEMINI_API_KEY || '' 
+  }));
   const wakeWordService = useRef<WakeWordService | null>(null);
   const memoryService = useRef<MemoryService>(new MemoryService());
   
@@ -112,12 +116,6 @@ const App: React.FC = () => {
   useEffect(() => {
       const savedCountdown = memoryService.current.getCountdown();
       if(savedCountdown) setEventCountdown(savedCountdown);
-
-      // Check for saved API Key
-      const savedKey = localStorage.getItem('MARCO_API_KEY');
-      if (savedKey) {
-          geminiService.current.updateApiKey(savedKey);
-      }
 
       // Check for Saved Theme
       const savedTheme = localStorage.getItem('MARCO_THEME');

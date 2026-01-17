@@ -199,8 +199,11 @@ export class GeminiLiveService {
   async validateCurrentKey(): Promise<boolean> {
       try {
           // Attempt a very cheap/fast call to check if the key is valid
-          const model = this.client.getGenerativeModel({ model: 'gemini-2.5-flash-latest' });
-          await model.countTokens({ contents: [{ role: 'user', parts: [{ text: 'test' }] }] });
+          // Using gemini-3-flash-preview for a quick text check as per guidelines
+          await this.client.models.generateContent({
+             model: 'gemini-3-flash-preview',
+             contents: 'test'
+          });
           return true;
       } catch (e) {
           console.error("API Key Validation Failed:", e);
@@ -242,7 +245,7 @@ export class GeminiLiveService {
     toolsHandler: (toolName: string, args: any) => Promise<any>
   ) {
     this.session = await this.client.live.connect({
-      model: 'gemini-2.5-flash-native-audio-preview-09-2025',
+      model: 'gemini-2.5-flash-native-audio-preview-12-2025',
       callbacks: {
         onopen: onOpen,
         onmessage: async (msg) => {
