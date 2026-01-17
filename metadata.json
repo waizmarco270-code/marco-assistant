@@ -1,0 +1,8 @@
+{
+  "name": "MARCO AI",
+  "description": "Personal AI Operating Companion. Voice-first, vision-capable, privacy-focused.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
