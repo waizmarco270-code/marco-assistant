@@ -249,15 +249,22 @@ export class GeminiLiveService {
       callbacks: {
         onopen: onOpen,
         onmessage: async (msg) => {
-          if (msg.toolCall) {
+          // Fix: Check for toolCall AND functionCalls to avoid undefined error
+          if (msg.toolCall?.functionCalls) {
             for (const fc of msg.toolCall.functionCalls) {
+              if (!fc.name) continue; // Fix: Skip if name is undefined
+              
               const result = await toolsHandler(fc.name, fc.args);
+              
+              // Fix: Handle sendToolResponse structure and potential undefined id
               this.session.sendToolResponse({
-                functionResponses: {
-                  id: fc.id,
-                  name: fc.name,
-                  response: { result: result },
-                }
+                functionResponses: [
+                  {
+                    id: fc.id || "unknown_id",
+                    name: fc.name,
+                    response: { result: result },
+                  }
+                ]
               });
             }
           }
